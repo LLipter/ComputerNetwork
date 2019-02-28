@@ -49,9 +49,9 @@ True or false?
 	
 	False. One response per request.
 	
-	\item \textbf{Two distinct Web pages (for example, www.mit.edu/research .html and www.mit.edu/students.html) can be sent over the same persistent connection.}
+	\item \textbf{Two distinct Web pages (for example, www.mit.edu/research .html and www.mit.edu /students.html) can be sent over the same persistent connection.}
 
-	True.
+	True.x
 	
 	\item \textbf{With nonpersistent connections between browser and origin server, it is possible for a single TCP segment to carry two distinct HTTP request messages.}
 	
@@ -120,7 +120,7 @@ The text below shows the reply sent from the server in response to the HTTP GET 
 
 ~\\
 
-HTTP/1.1 200 OK<cr><lf>Date: Tue, 07 Mar 2008 12:39:45GMT<cr><lf>Server: Apache/ 2.0.52 (Fedora) <cr><lf>Last-Modified: Sat, 10 Dec2005 18:27:46 GMT<cr><lf>ETag: ”526c3-f22-a88a4c80”<cr><lf>Accept- Ranges: bytes<cr><lf>Content-Length: 3874<cr><lf> Keep-Alive: timeout=max=100<cr><lf>Connection: Keep-Alive<cr><lf>Content-Type: text/html; charset = ISO-8859-1 <cr><lf><cr><lf><!doctype html public ”- //w3c//dtd html 4.0transitional//en”><lf><html><lf> <head> <lf> <meta http-equiv=”Content-Type” content=”text/html; charset=iso-8859-1”><lf> <meta name=”GENERATOR” content=”Mozilla/4.79 [en] (Windows NT 5.0; U) Netscape]”><lf> <title>CMPSCI 453 / 591 / NTU-ST550ASpring 2005 homepage </title><lf> </head><lf> <much more document text following here (not shown)>
+HTTP/1.1 200 OK<cr><lf>Date: Tue, 07 Mar 2008 12:39:45GMT<cr><lf>Server: Apache/ 2.0.52 (Fedora) <cr><lf>Last-Modified: Sat, 10 Dec2005 18:27:46 GMT<cr><lf>ETag: ”526c3-f22-a88a4c80”<cr><lf>Accept- Ranges: bytes<cr><lf>Content-Length: 3874<cr><lf> Keep-Alive: timeout=max=100<cr><lf>Connection: Keep-Alive<cr><lf>Content-Type: text/ html; charset = ISO-8859-1 <cr><lf><cr><lf><!doctype html public ”- //w3c//dtd html 4.0transitional//en”><lf><html><lf> <head> <lf> <meta http-equiv=”Content-Type” content=”text /html; charset=iso-8859-1”><lf> <meta name=”GENERATOR” content=”Mozilla/4.79 [en] (Windows NT 5.0; U) Netscape]”><lf> <title>CMPSCI 453 / 591 / NTU-ST550ASpring 2005 homepage </title><lf> </head><lf> <much more document text following here (not shown)>
 
 \begin{qparts}
 	\item \textbf{Was the server able to successfully find the document or not? What time was the document reply provided?
