@@ -1,0 +1,7 @@
+HELO llipter
+MAIL FROM: <liaoran@llipter.com>
+RCPT TO: <2016302580055@whu.edu.cn>
+DATA
+Hello, llipter!
+.
+QUIT
