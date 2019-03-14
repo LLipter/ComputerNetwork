@@ -7,6 +7,7 @@ print('The server is ready to receive')
 while True:
     connectionSocket, addr = serverSocket.accept()
     name = connectionSocket.recv(1024).decode()
+    print('Receive message from', name)
     resp = 'Hi, ' + name + '. How are you?'
     connectionSocket.send(resp.encode())
     connectionSocket.close()
