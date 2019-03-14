@@ -89,168 +89,56 @@ To host $C$, right process: Source port = 80, source IP address = $b$, dest port
 \newpage
 \section{Problem 4}
 
-Consider the following string of ASCII characters that were captured by Wireshark when the browser sent an HTTP GET message (i.e., this is the actual content of an HTTP GET message). The characters <cr><lf> are carriage return and line-feed characters (that is, the italized character string <cr> in the text below represents the single carriage-return character that was contained at that point in the HTTP header). Answer the following questions, indicating where in the HTTP GET message below you find the answer.
+\textbf{Assume that a host receives a UDP segment with 01011101 11110010 (we separated the values of each byte with a space for clarity) as the checksum. The host adds the 16-bit words over all necessary fields excluding the checksum and obtains the value 00110010 00001101. Is the segment considered correctly received or not? What does the receiver do?}
 
 ~\\
 
-GET /cs453/index.html HTTP/1.1<cr><lf>Host: gaia.cs.umass.edu<cr><lf>User-Agent: Mozilla/5.0 ( Windows;U; Windows NT 5.1; en-US; rv:1.7.2) Gec ko/20040804 Netscape/7.2 (ax) <cr> <lf>Accept:ex t/xml, application/xml, application/xhtml+xml, text /html; q=0.9, text/plain; q=0.8,image/png,*/*; q=0.5<cr><lf>Accept-Language: en-us,en;q=0.5<cr><lf>Accept- Encoding: zip,deflate<cr><lf>Accept-Charset: ISO -8859-1,utf-8;q=0.7,*;q=0.7<cr><lf>Keep-Alive: 300<cr> <lf>Connection:keep-alive<cr><lf><cr><lf>
+ 
+\begin{center} 
+\begin{tabular}{ccccccccccccccccccc}
+	&  & 0&1&0&1&1&1&0&1 & &1&1&1&1&0&0&1&0 \\
+	&+& 0&0&1&1&0&0&1&0 & &0&0&0&0&1&1&0&1 \\
+	\hline
+	&  & 1&0&0&0&1&1&1&1 & &1&1&1&1&1&1&1&1 \\
+\end{tabular}
+\end{center}
 
-\begin{qparts}
-	\item \textbf{What is the URL of the document requested by the browser?}
-	
-	gaia.cs.umass.edu/cs453/index.html
-	
+As demonstrated above, the overall checksum contains 0. Therefore, it is not valid. The receiver will drop this packet and wait for retransmitting.
 
-	\item  \textbf{What version of HTTP is the browser running?}
 
-	HTTP/1.1
-	
-	\item  \textbf{Does the browser request a non-persistent or a persistent connection?}
-	
-	Persistent connection.
-	
-	\item  \textbf{What is the IP address of the host on which the browser is running?}
-	
-	No such information in HTTP request.
-	
-	\item  \textbf{What type of browser initiates this message? Why is the browser type needed in an HTTP request message?}
-	
-	Mozilla/5.0. Given this message, the server can send different version of objects to different browser to improve performance.
-	
 
-\end{qparts}
 
 \newpage
-\section{Problem 4}
+\section{Problem 28}
 
-The text below shows the reply sent from the server in response to the HTTP GET message in the question above. Answer the following questions, indicat- ing where in the message below you find the answer.
+\textbf{Host A and B are directly connected with a 100 Mbps link. There is one TCP connection between the two hosts, and Host A is sending to Host B an enormous file over this connection. Host A can send its application data into its TCP socket at a rate as high as 120 Mbps but Host B can read out of its TCP receive buffer at a maximum rate of 50 Mbps. Describe the effect of TCP flow control.}
 
 ~\\
 
-HTTP/1.1 200 OK<cr><lf>Date: Tue, 07 Mar 2008 12:39:45GMT<cr><lf>Server: Apache/ 2.0.52 (Fedora) <cr><lf>Last-Modified: Sat, 10 Dec2005 18:27:46 GMT<cr><lf>ETag: ”526c3-f22-a88a4c80”<cr><lf>Accept- Ranges: bytes<cr><lf>Content-Length: 3874<cr><lf> Keep-Alive: timeout=max=100<cr><lf>Connection: Keep-Alive<cr><lf>Content-Type: text/ html; charset = ISO-8859-1 <cr><lf><cr><lf><!doctype html public ”- //w3c//dtd html 4.0transitional//en”><lf><html><lf> <head> <lf> <meta http-equiv=”Content-Type” content=”text /html; charset=iso-8859-1”><lf> <meta name=”GENERATOR” content=”Mozilla/4.79 [en] (Windows NT 5.0; U) Netscape]”><lf> <title>CMPSCI 453 / 591 / NTU-ST550ASpring 2005 homepage </title><lf> </head><lf> <much more document text following here (not shown)>
+Since the link capacity is only 100 Mbps, so host A’s sending rate can be at most 100Mbps. Still, host A sends data into the receive buffer faster than Host B can remove data from the buffer. The receive buffer fills up at a rate of roughly 50Mbps. When the buffer is full, Host B signals to Host A to stop sending data by setting $RcvWindow = 0$. Host A then stops sending until it receives a TCP segment with $RcvWindow > 0$. Host A will thus repeatedly stop and start sending as a function of the $RcvWindow$ values it receives from Host B. On average, the long-term rate at which Host A sends data to Host B as part of this connection is no more than 50Mbps.
 
-\begin{qparts}
-	\item \textbf{Was the server able to successfully find the document or not? What time was the document reply provided?
-}
-
-	Yes. It's on Tue, 07 Mar 2008 12:39:45GMT.
-	
-	\item \textbf{When was the document last modified?}
-	
-	Sat, 10 Dec2005 18:27:46 GMT.
-	
-	\item \textbf{How many bytes are there in the document being returned?}
-	
-	3874
-	
-	\item \textbf{What are the first 5 bytes of the document being returned? Did the server agree to a persistent connection?}
-
-	The first 5 byte is <!doc. And the server agree to open a persistent connection.
-
-\end{qparts}
 
 \newpage
-\section{Problem 17}
+\section{Problem 40}
 
-Consider accessing your e-mail with POP3.
+\textbf{Consider Figure 3.58. Assuming TCP Reno is the protocol experiencing the behavior shown above, answer the following questions. In all cases, you should provide a short discussion justifying your answer.}
 
 \begin{qparts}
-	\item \textbf{Suppose you have configured your POP mail client to operate in the download-and-delete mode.}
+	\item \textbf{Identify the intervals of time when TCP slow start is operating.}
 
-	C: list 
+	TCP slowstart is operating in the intervals [1,6] and [23,26]
 	
-	S: 1 498 
+	\item \textbf{Identify the intervals of time when TCP congestion avoidance is operating.}
 	
-	S: 2 912 
+	TCP congestion avoidance is operating in the intervals [6,16] and [17,22]
 	
-	S: .
+	\item \textbf{After the 16th transmission round, is segment loss detected by a triple duplicate ACK or by a timeout?}
 	
-	C: retr 1
+	 After the 16th transmission round, packet loss is recognized by a triple duplicate ACK. If there was a timeout, the congestion window size would have dropped to 1.
 	
-	S: blah blah ... 
+	\item \textbf{After the 22nd transmission round, is segment loss detected by a triple duplicate ACK or by a timeout?}
 	
-	S: ..........blah 
-	
-	S: .
-	
-	C: dele 1 
-	
-	C: retr 2
-
-	S: (blah blah ... 
-	
-	S: ...........blah) 
-	
-	S: .
-
-	C: dele 2
-
-	C: quit
-
-	S: +OK POP3 server signing off
-
-	
-	\item \textbf{What is the total response time for the scenario illustrated in Figure 2.20?}
-	
-	C: list 
-	
-	S: 1 498 
-	
-	S: 2 912 
-	
-	S: .
-
-	C: retr 1
-	
-	S: blah blah ... 
-	
-	S: ..........blah 
-	
-	S: .
-	
-	C: retr 2
-
-	S: blah blah ...
-
-	S: ...........blah
-
-	S: .
-
-	C: quit
-
-	S: +OK POP3 server signing off
-
-	
-	\item \textbf{Suppose you have configured your POP mail client to operate in the download-and-keep mode. Using your transcript in part (b), suppose you retrieve messages 1 and 2, exit POP, and then five minutes later you again access POP to retrieve new e-mail. Suppose that in the five-minute interval no new mes- sages have been sent to you. Provide a transcript of this second POP session.}
-	
-	C: list 
-	
-	S: 1 498
-
-	S: 2 912
-
-	S: .
-
-	C: retr 1
-
-	S: blah ..... 
-	
-	S: ....blah 
-	
-	S: .
-
-	C: retr 2
-
-	S: blah blah ...
-
-	S: ...........blah
-
-	S: .
-
-	C: quit
-
-	S: +OK POP3 server signing off
-	
+	After the 22nd transmission round, segment loss is detected due to timeout, and hence the congestion window size is set to 1.
 	
 \end{qparts}
 
