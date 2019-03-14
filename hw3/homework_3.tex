@@ -47,42 +47,43 @@
 \newpage
 \section{Problem 1}
 
-True or false?
+\textbf{Suppose Client A requests a web page from Server S through HTTP and its socket is associated with port 33000.}
 
 \begin{qparts}
 
-	\item \textbf{A user requests a Web page that consists of some text and three images. For this page, the client will send one request message and receive four response messages.}
+	\item \textbf{What are the source and destination ports for the segments sent from A to S?}
 	
-	False. One response per request.
+	Source port is 33000 and destination port is 80.
 	
-	\item \textbf{Two distinct Web pages (for example, www.mit.edu/research .html and www.mit.edu /students.html) can be sent over the same persistent connection.}
+	\item \textbf{What are the source and destination ports for the segments sent from S to A?}
 
-	True.x
+	Source port is 80 and destination port is 33000.
 	
-	\item \textbf{With nonpersistent connections between browser and origin server, it is possible for a single TCP segment to carry two distinct HTTP request messages.}
+	\item \textbf{Can Client A contact to Server S using UDP as the transport protocol?}
 	
-	False. Nonpersistent connections will send only one object per connection.
+	No. HTTP is built upon TCP.
 	
-	\item \textbf{The Date: header in the HTTP response message indicates when the object in the response was last modified.}
+	\item \textbf{Can Client A request multiple resources in a single TCP connection}
 	
-	False. The Date: header line indicates the time and date when the HTTP response was created and sent by the server. Note that this is not the time when the object was created or last modified; it is the time when the server retrieves the object from its file system, inserts the object into the response message, and sends the response message. 
-	
-	\item \textbf{HTTP response messages never have an empty message body.}
-
-	False. This could happen when using conditional GET.
+	Yes. there's no limit on how many data can be transported through a single TCP connection.
 
 \end{qparts}
 
 
 \newpage
-\section{Problem 3}
+\section{Problem 2}
 
-\textbf{Assume you open a browser and enter http://yourbusiness.com/about.html in the address bar. What happens until the webpage is dis- played? Provide details about the protocol(s) used and a high-level description of the messages exchanged.}
+\textbf{Consider Figure 3.5. What are the source and destination port values in the seg- ments flowing from the server back to the clients’ processes? What are the IP addresses in the network-layer datagrams carrying the transport-layer segments?}
 
 ~\\
 
-DNS protocol is used to convert domain to IP address and HTTP protocol is used to communicate with the server. Both of them are in application layer. And in transportation layer, TCP and UDP is used.
-	
+Suppose the IP addresses of the hosts $A, B$, and $C$ are $a, b, c$, respectively. 
+
+To host $A$: Source port = 80, source IP address = $b$, dest port = 26145, dest IP address = $a$.
+
+To host $C$, left process: Source port = 80, source IP address = $b$, dest port = 7532, dest IP address = $c$.
+
+To host $C$, right process: Source port = 80, source IP address = $b$, dest port = 26145, dest IP address = $c$.
 
 
 \newpage
