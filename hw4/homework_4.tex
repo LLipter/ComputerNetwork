@@ -1,0 +1,123 @@
+% Search for all the places that say "PUT SOMETHING HERE".
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,enumerate}
+\usepackage{ctex}
+
+\def\Name{了然}  % Your name
+\def\SID{2016302580055}  % Your student ID number
+\def\Homework{4} % Number of Homework
+\def\Session{Spring 2019}
+
+
+\title{\Large Networks and Distributed Computing --- Spring 2019 --- Homework \Homework\ }
+\author{\Name, Student ID: \SID}
+\markboth{Networks and Distributed Computing--\Session\  Homework \Homework\ \Name}{Networks and Distributed Computing--\Session\ Homework \Homework\ \Name}
+\pagestyle{myheadings}
+\date{\today}
+
+\newenvironment{qparts}{\begin{enumerate}[{(}a{)}]}{\end{enumerate}}
+\def\endproofmark{$\Box$}
+\newenvironment{proof}{\par{\bf Proof}:}{\endproofmark\smallskip}
+
+\textheight=9in
+\textwidth=6.5in
+\topmargin=-.75in
+\oddsidemargin=0.25in
+\evensidemargin=0.25in
+
+
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+
+\textbf{Consider the network below.}
+
+\begin{qparts}
+
+	\item \textbf{Show the forwarding table in router A, such that all traffic destined to host H3 is forwarded through interface 3.}
+	
+	\begin{tabular}{c|c}
+		Destination Address & Link Interface \\
+		\hline
+		H3 & 3 \\
+	\end{tabular}
+	
+	\item \textbf{Can you write down a forwarding table in router A, such that all traffic from H1 destined to host H3 is forwarded through interface 3, while all traffic from H2 destined to host H3 is forwarded through interface 4? (Hint: This is a trick question.)}
+
+	No, because forwarding rule is only based on destination address.
+	
+
+\end{qparts}
+
+
+\newpage
+\section{Problem 2}
+
+\textbf{Suppose two packets arrive to two different input ports of a router at exactly the same time. Also suppose there are no other packets anywhere in the router.}
+
+\begin{qparts}
+
+	\item \textbf{Suppose the two packets are to be forwarded to two different output ports. Is it possible to forward the two packets through the switch fabric at the same time when the fabric uses a shared bus?}
+
+	No, you can only transmit one packet at a time over a shared bus.
+	
+	\item \textbf{Suppose the two packets are to be forwarded to two different output ports. Is it possible to forward the two packets through the switch fabric at the same time when the fabric uses switching via memory?}
+	
+	No, only one memory read/write can be done at a time over the shared system bus.
+	
+	\item \textbf{Suppose the two packets are to be forwarded to the same output port. Is it possible to forward the two packets through the switch fabric at the same time when the fabric uses a crossbar?}
+	
+	No, in this case the two packets would have to be sent over the same output bus at the same time, which is not possible.
+	
+\end{qparts}
+
+\newpage
+\section{Problem 3}
+
+\textbf{In Section 4.2, we noted that the maximum queuing delay is (n–1)D if the switching fabric is n times faster than the input line rates. Suppose that all packets are of the same length, n packets arrive at the same time to the n input ports, and all n packets want to be forwarded to different output ports. What is the maximum delay for a packet for the (a) memory, (b) bus, and (c) crossbar switching fabrics?}
+
+\begin{qparts}
+
+	\item \textbf{memory}
+
+	$(n-1)D$, since only one packet can be forwarded at a time via memory.
+	
+	\item \textbf{bus}
+	
+	$(n-1)D$, since only one packet can be forwarded at a time via a shared bus.
+	
+	\item \textbf{crossbar switching fabrics}
+	
+	$0$, since all $n$ packets are forwarded to different ports, so they can be processed simultaneously. 
+	
+\end{qparts}
+ 
+
+
+
+\newpage
+\section{Problem 8}
+
+\textbf{Consider a router that interconnects three subnets: Subnet 1, Subnet 2, and Subnet 3. Suppose all of the interfaces in each of these three subnets are required to have the prefix 223.1.17/24. Also suppose that Subnet 1 is required to support up to 62 interfaces, Subnet 2 is to support up to 106 interfaces, and Subnet 3 is to support up to 15 interfaces. Provide three network addresses (of the form a.b.c.d/x) that satisfy these constraints.}
+
+~\\
+
+Subnet 1 : 223.1.17.0/26 
+
+Subnet 2 : 223.1.17.128/25 
+
+Subnet 3 : 223.1.17.64/28
+
+
+\newpage
+\section{Problem 14}
+
+\textbf{Consider sending a 1,600-byte datagram into a link that has an MTU of 500 bytes. Suppose the original datagram is stamped with the identification number 291. How many fragments are generated? What are the values in the various fields in the IP datagram(s) generated related to fragmentation?}
+
+	The maximum size of data field in each fragment = 480 (because there are 20 bytes IP header). Thus the number of required fragments = $ \lceil  \frac{1600 − 20 } {480} \rceil = 4$
+	
+	Each fragment will have Identification number 291. Each fragment except the last one will be of size 500 bytes (including IP header). The last datagram will be of size 160 bytes (including IP header). The offsets of the 4 fragments will be 0, 60, 120, 180. Each of the first 3 fragments will have flag=1; the last fragment will have flag=0.
+
+\end{document}
