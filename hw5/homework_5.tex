@@ -1,0 +1,113 @@
+% Search for all the places that say "PUT SOMETHING HERE".
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,enumerate}
+\usepackage{ctex}
+
+\def\Name{了然}  % Your name
+\def\SID{2016302580055}  % Your student ID number
+\def\Homework{5} % Number of Homework
+\def\Session{Spring 2019}
+
+
+\title{\Large Networks and Distributed Computing --- Spring 2019 --- Homework \Homework\ }
+\author{\Name, Student ID: \SID}
+\markboth{Networks and Distributed Computing--\Session\  Homework \Homework\ \Name}{Networks and Distributed Computing--\Session\ Homework \Homework\ \Name}
+\pagestyle{myheadings}
+\date{\today}
+
+\newenvironment{qparts}{\begin{enumerate}[{(}a{)}]}{\end{enumerate}}
+\def\endproofmark{$\Box$}
+\newenvironment{proof}{\par{\bf Proof}:}{\endproofmark\smallskip}
+
+\textheight=9in
+\textwidth=6.5in
+\topmargin=-.75in
+\oddsidemargin=0.25in
+\evensidemargin=0.25in
+
+
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+
+\textbf{Looking at Figure 5.3, enumerate the paths from y to u that do not contain any loops}
+
+~\\
+
+y-x-u, y-x-v-u, y-x-w-u, y-x-w-v-u
+
+y-w-u, y-w-v-u, y-w-x-u, y-w-x-v-u, y-w-v-x-u
+
+y-z-w-u, y-z-w-v-u, y-z-w-x-u, y-z-w-x-v-u, y-z-w-v-x-u
+
+
+\newpage
+\section{Problem 3}
+
+\textbf{Consider the following network. With the indicated link costs, use Dijkstra’s shortest-path algorithm to compute the shortest path from x to all network nodes. Show how the algorithm works by computing a table similar to Table 5.1}
+
+~\\
+
+\begin{tabular}{c|c|c|c|c|c|c|c}
+	Step & $N^\prime$ & $D(t),P(t)$ & $D(u),P(u)$ & $D(v),P(v)$ & $D(w),P(w)$ & $D(y),P(y)$ & $D(z),P(z)$ \\
+	\hline
+	0 & $x$              & $\infty$ & $\infty$ & $3, x$ & $6, x$ & $6, x$ & $8, x$ \\
+	1 & $xv$            & $7, v$ & $6,v$ & $3, x$ & $6, x$ & $6, x$ & $8, x$ \\
+	2 & $xvu$           & $7, v$ & $6,v$ & $3, x$ & $6, x$ & $6, x$ & $8, x$ \\
+	3 & $xvuw$        & $7, v$ & $6,v$ & $3, x$ & $6, x$ & $6, x$ & $8, x$ \\
+	4 & $xvuwy$      & $7, v$ & $6,v$ & $3, x$ & $6, x$ & $6, x$ & $8, x$ \\
+	5 & $xvuwyt$     & $7, v$ & $6,v$ & $3, x$ & $6, x$ & $6, x$ & $8, x$ \\
+	6 & $xvuwytz$   & $7, v$ & $6,v$ & $3, x$ & $6, x$ & $6, x$ & $8, x$ \\
+\end{tabular}
+
+\newpage
+\section{Problem 6}
+
+\textbf{Consider a general topology (that is, not the specific network shown above) and a synchronous version of the distance-vector algorithm. Suppose that at each itera- tion, a node exchanges its distance vectors with its neighbors and receives their distance vectors. Assuming that the algorithm begins with each node knowing only the costs to its immediate neighbors, what is the maximum number of itera- tions required before the distributed algorithm converges? Justify your answer.}
+
+~\\
+
+Let $d$ be the “diameter” of the network - the length of the longest path without loops between any two nodes in the network. After$d −1$ iterations, all nodes will know the shortest path cost of $d$ or fewer hops to all other nodes. Since any path with greater than $d$ hops will have loops (and thus have a greater cost than that path with the loops removed), the algorithm will converge in at most $d −1$ iterations.
+ 
+
+
+
+\newpage
+\section{Problem 7}
+
+\textbf{Consider the network fragment shown below. x has only two attached neigh- bors, w and y. w has a minimum-cost path to destination u (not shown) of 5, and y has a minimum-cost path to u of 6. The complete paths from w and y to u (and between w and y) are not shown. All link costs in the network have strictly positive integer values.}
+
+\begin{qparts}
+
+	\item \textbf{Give x’s distance vector for destinations w, y, and u.}
+	
+	$Dx(w) = 2, Dx(y) = 4, Dx(u) = 7$
+	
+	\item \textbf{Give a link-cost change for either $c(x,w)$ or $c(x,y)$ such that x will inform its neighbors of a new minimum-cost path to u as a result of executing the distance-vector algorithm.}
+
+	Change $c(x,w)$ to 1 will be sufficient.
+	
+	\item \textbf{Give a link-cost change for either $c(x,w)$ or $c(x,y)$ such that x will not inform its neighbors of a new minimum-cost path to u as a result of executing the distance-vector algorithm.}
+
+	Change $c(x,y)$ to 6 will be sufficient.
+
+\end{qparts}
+
+
+\newpage
+\section{Problem 21}
+
+\textbf{Consider the two ways in which communication occurs between a managing entity and a managed device: request-response mode and trapping. What are the pros and cons of these two approaches, in terms of (1) overhead, (2) noti- fication time when exceptional events occur, and (3) robustness with respect to lost messages between the managing entity and the device?}
+
+
+~\\
+
+Request response mode will generally have more overhead (measured in terms of the number of messages exchanged) for several reasons. First, each piece of information received by the manager requires two messages: the poll and the response. Trapping generates only a single message to the sender. If the manager really only wants to be notified when a condition occurs, polling has more overhead, since many of the polling messages may indicate that the waited-for condition has not yet occurred. Trapping generates a message only when the condition occurs.
+
+Trapping will also immediately notify the manager when an event occurs. With polling, the manager needs will need to wait for half a polling cycle (on average) between when the event occurs and the manager discovers (via its poll message) that the event has occurred.
+
+If a trap message is lost, the managed device will not send another copy. If a poll message, or its response, is lost the manager would know there has been a lost message (since the reply never arrives). Hence the manager could repoll, if needed.
+
+\end{document}
