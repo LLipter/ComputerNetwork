@@ -1,0 +1,161 @@
+% Search for all the places that say "PUT SOMETHING HERE".
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,enumerate}
+\usepackage{ctex}
+
+\def\Name{了然}  % Your name
+\def\SID{2016302580055}  % Your student ID number
+\def\Homework{6} % Number of Homework
+\def\Session{Spring 2019}
+
+
+\title{\Large Networks and Distributed Computing --- Spring 2019 --- Homework \Homework\ }
+\author{\Name, Student ID: \SID}
+\markboth{Networks and Distributed Computing--\Session\  Homework \Homework\ \Name}{Networks and Distributed Computing--\Session\ Homework \Homework\ \Name}
+\pagestyle{myheadings}
+\date{\today}
+
+\newenvironment{qparts}{\begin{enumerate}[{(}a{)}]}{\end{enumerate}}
+\def\endproofmark{$\Box$}
+\newenvironment{proof}{\par{\bf Proof}:}{\endproofmark\smallskip}
+
+\textheight=9in
+\textwidth=6.5in
+\topmargin=-.75in
+\oddsidemargin=0.25in
+\evensidemargin=0.25in
+
+
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+
+\textbf{Suppose the information content of a packet is the bit pattern 1010 0111 0101 1001 and an even parity scheme is being used. What would the value of the field containing the parity bits be for the case of a two-dimensional parity scheme? Your answer should be such that a minimum-length checksum field is used.}
+
+~\\
+
+\begin{tabular}{cccc|c}
+1 & 1 & 1 & 0 & 1 \\ 
+0 & 1 & 1 & 0 & 0 \\ 
+1 & 0 & 0 & 1 & 0 \\
+1 & 1 & 0 & 1 & 1 \\
+\hline
+1 & 1 & 0 & 0 & 0 \\
+\end{tabular}
+
+\newpage
+\section{Problem 8}
+
+\textbf{In Section 6.3, we provided an outline of the derivation of the efficiency of slotted ALOHA. In this problem we’ll complete the derivation.}
+
+\begin{qparts}
+	\item \textbf{Recall that when there are $N$ active nodes, the efficiency of slotted ALOHA is $Np(1 - p)^{N-1}$. Find the value of $p$ that maximizes this expression.}
+	\begin{align*}
+		E(p)
+		&=
+		Np(1 - p)^{N-1} \\
+		E^\prime(p)
+		&=
+		N(1 - p)^{N-1} - Np(N-1)(1 - p)^{N-2} \\
+		&=
+		N(1 - p)^{N-2}((1-p) - p(N-1)) \\
+		&=
+		N(1 - p)^{N-2}(1-Np)
+	\end{align*}
+	Let $E^\prime(p) = 0$, we have $p^* = \frac{1}{N}$.
+	\item \textbf{Using the value of $p$ found in (a), find the efficiency of slotted ALOHA by letting $N$ approach infinity. Hint: $(1 - 1/N)^N$ approaches $\frac{1}{e}$ as $N$ approaches infinity.}
+
+	\begin{align*}
+		\lim_{n \to +\infty} E(p^*)
+		&=
+		\lim_{n \to +\infty} Np^*(1 - p^*)^{N-1} \\
+		&=
+		\lim_{n \to +\infty} N\frac{1}{N}(1 - \frac{1}{N})^{N-1} \\
+		&=
+		\lim_{n \to +\infty} (1 - \frac{1}{N})^{N-1} \\
+		&=
+		\lim_{n \to +\infty} \frac{(1 - \frac{1}{N})^{N}}{1 - \frac{1}{N}} \\
+		&=
+		\frac{\frac{1}{e}}{1} \\
+		&= 
+		\frac{1}{e}
+	\end{align*}	
+\end{qparts}
+
+
+
+\newpage
+\section{Problem 10}
+
+\textbf{Consider two nodes, A and B, that use the slotted ALOHA protocol to contend for a channel. Suppose node A has more data to transmit than node B, and node A's retransmission probability $p_A$ is greater than node B's retransmission probability, $p_B$.}
+
+\begin{qparts}
+	\item \textbf{Provide a formula for node A's average throughput. What is the total efficiency of the protocol with these two nodes?}
+	
+	A's average throughput is $p_A(1 - p_B)$.
+	
+	The total efficiency is $p_A(1 - p_B) + p_B(1 - p_A)$.
+	
+	\item \textbf{If $p_A = 2p_B$, is node A's average throughput twice as large as that of node B? Why or why not? If not, how can you choose $p_A$ and $p_B$ to make that happen?}
+
+	A's average throughput is $p_A(1 - p_B) = 2p_B(1 - p_B) = 2p_B - 2p_B^2$.
+	
+	B's average throughput is $p_B(1 - p_A) = p_B(1 - 2p_B) = p_B - 2p_B^2$.
+	
+	Clearly, A's throughput is not twice as large as B's.
+	
+	In order to make this happen, let $p_A(1 - p_B) = 2p_B(1 - p_A)$. We have $p_A = \frac{2p_B}{1+p_B}$.
+	
+	\item \textbf{In general, suppose there are $N$ nodes, among which node A has retransmission probability $2p$ and all other nodes have retransmission probability $p$. Provide expressions to compute the average throughputs of node A and of any other node.}
+	
+	A's throughput is $2p(1-p)^{N-1}$, and any other node has throughput $p(1-p)^{N-2}(1-2p)$.
+
+\end{qparts}
+
+
+
+\newpage
+\section{Problem 11}
+
+\textbf{Suppose four active nodes—nodes $A, B, C$ and $D$—are competing for access to a channel using slotted ALOHA. Assume each node has an infinite number of packets to send. Each node attempts to transmit in each slot with probability $p$. The first slot is numbered slot 1, the second slot is numbered slot 2, and so on.}
+
+\begin{qparts}
+
+	\item \textbf{What is the probability that node $A$ succeeds for the first time in slot 5?}
+	
+	Denote $P(X)$ to be the probability that node $X$ succeeds in a time slot.
+	
+	Clearly,  $P(X) = p(1-p)^3$.
+	
+	Therefore, the answer is $(1-P(X))^4P(X) = (1 - p(1-p)^3)^4p(1-p)^3)$.
+	
+	\item \textbf{What is the probability that some node (either $A, B, C$ or $D$) succeeds in slot 4?}
+	
+	$4p(1-p)^3$
+
+	\item \textbf{What is the probability that the first success occurs in slot 3?}
+	
+	$(1-4p(1-p)^3)^24p(1-p)^3$
+
+	\item \textbf{What is the efficiency of this four-node system?}
+	
+	$4p(1-p)^3$
+
+\end{qparts}
+
+
+\newpage
+\section{Problem 13}
+
+\textbf{Consider a broadcast channel with N nodes and a transmission rate of $R$ bps. Suppose the broadcast channel uses polling (with an additional polling node) for multiple access. Suppose the amount of time from when a node completes transmission until the subsequent node is permitted to transmit (that is, the polling delay) is $d_{poll}$. Suppose that within a polling round, a given node is allowed to transmit at most $Q$ bits. What is the maximum throughput of the broadcast channel?}
+
+
+~\\
+
+The length of a polling round is $N(\frac{Q}{R} + d_{poll})$.
+
+Therefore, The efficiency $E =\frac{NQ}{N(\frac{Q}{R} + d_{poll})} =  \frac{RQ}{(Q + Rd_{poll})}$
+
+\end{document}
