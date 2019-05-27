@@ -107,14 +107,6 @@ The \textbf{transmission delay} is the amount of time required for the router to
 
 To provide structure to the design of network protocols, network designers organize protocols—and the network hardware and software that implement the protocols— in \textbf{layers}. We are interested in the \textbf{services} that a layer offers to the layer above—the so-called \textbf{service model} of a layer. When taken together, the protocols of the various layers are called the \textbf{protocol stack}.
 
-\subsection{Application Layer}
-
-The application layer is where network applications and their application-layer protocols reside. The Internet's application layer includes many protocols, such as the HTTP, SMTP, FTP and DNS.
-
-\subsection{Transport Layer}
-
-The Internet’s transport layer transports application-layer messages between application endpoints. In the Internet there are two transport protocols, TCP and UDP, either of which can transport application-layer messages. TCP provides a connection-oriented service to its applications, whereas the UDP protocol provides a connectionless service to its applications. 
-
 \subsection{Network Layer}
 
 The Internet’s network layer is responsible for moving network-layer packets known as datagrams from one host to another.
@@ -127,12 +119,386 @@ The Internet’s network layer routes a datagram through a series of routers bet
 
 While the job of the link layer is to move entire frames from one network element to an adjacent network element, the job of the physical layer is to move the individual bits within the frame from one node to the next.
 
-\section{Security Threat}
+\section{Security Threats}
 
 \begin{itemize}
 	\item \textbf{Denial-of-Service (DoS)}
 	\item \textbf{Sniffing}
 	\item \textbf{Spoofing}
 \end{itemize}
+
+\section{Application Layer}
+
+The application layer is where network applications and their application-layer protocols reside. The Internet's application layer includes many protocols, such as the HTTP, SMTP, FTP and DNS.
+
+\subsection{Transport Services Available to Applications}
+
+\subsubsection{Reliable Data Transfer}
+
+If a protocol provides a guaranteed data delivery service, it is said to provide \textbf{reliable data transfer}. When a transport-layer protocol doesn’t provide reliable data transfer, some of the data sent by the sending process may never arrive at the receiving process. This may be acceptable for \textbf{loss-tolerant applications}.
+
+\subsubsection{Throughput}
+
+A transport-layer protocol may provide guaranteed available throughput at some specified rate. Applications that have throughput requirements are said to be \textbf{bandwidth-sensitive applications}, whereas \textbf{elastic applications} can make use of as much, or as little, throughput as happens to be available.
+
+\subsubsection{Timing}
+
+A transport-layer protocol can also provide timing guarantees.
+
+\subsubsection{Security}
+
+A transport protocol can provide an application with one or more security services.
+
+\subsection{Network Application Architectures}
+
+\subsubsection{Client-Server Architecture}
+
+In a client-server architecture, there is an always-on host, called the \textbf{server}, which services requests from many other hosts, called \textbf{clients}. Often in a client-server application, a single-server host is incapable of keeping up with all the requests from clients. For this reason, a \textbf{data center}, housing a large number of hosts, is often used to create a powerful virtual server. 
+
+\subsubsection{P2P Architecture}
+
+In a P2P architecture, there is minimal (or no) reliance on dedicated servers in data centers. Instead the application exploits direct communication between pairs of intermittently connected hosts, called \textbf{peers}. One of the most compelling features of P2P architectures is their \textbf{self-scalability}. P2P architectures are also cost effective, since they normally don’t require significant server infrastructure and server bandwidth. However, P2P applications face challenges of security, performance, and reliability due to their highly decentralized structure.
+
+
+\subsection{HTTP : HyperText Transfer Protocol}
+
+HTTP is implemented in two programs: a client program and a server program. The client program and server program, executing on different end systems, talk to each other by exchanging HTTP messages.
+HTTP is mainly a \textbf{pull protocol} --- someone loads information on a Web server and users use HTTP to pull the information from the server at their convenience.
+Because an HTTP server maintains no information about the clients, HTTP is said to be a \textbf{stateless protocol}.
+If each request/response pair be sent over a separate TCP connection, the application is said to use \textbf{non-persistent connections}. If all of the requests and their corresponding responses be sent over the same TCP connection, the application is said to use \textbf{persistent connections}. HTTP can use both non-persistent connections and persistent connections.
+
+\subsubsection{HTTP Request Message}
+
+~\ 
+
+\texttt{GET /somedir/page.html HTTP/1.1}
+
+\texttt{Host: www.someschool.edu}
+
+\texttt{Connection: close}
+
+\texttt{User-agent: Mozilla/5.0}
+
+\texttt{Accept-language: fr}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/HttpRequest.png}
+	\caption{General format of an HTTP request message}
+	\label{fig:HttpRequest}
+\end{figure}
+
+\subsubsection{HTTP Response Message}
+
+~\
+
+\texttt{HTTP/1.1 200 OK}
+
+\texttt{Connection: close}
+
+\texttt{Date: Tue, 18 Aug 2015 15:44:04 GMT}
+
+\texttt{Server: Apache/2.2.3 (CentOS)}
+
+\texttt{Last-Modified: Tue, 18 Aug 2015 15:11:03 GMT}
+
+\texttt{Content-Length: 6821}
+
+\texttt{Content-Type: text/html}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/HttpResponse.png}
+	\caption{General format of an HTTP response message}
+	\label{fig:HttpResponse}
+\end{figure}
+
+\subsubsection{Common HTTP Status Codes}
+
+\begin{itemize}
+	\item \textbf{200 OK}
+	
+	Request succeeded and the information is returned in the response.
+	
+	\item \textbf{301 Moved Permanently}
+	
+	Requested object has been permanently moved; the new URL is specified in \textit{Location} header of the response message. The client software will automatically retrieve the new URL.
+	
+	\item \textbf{400 Bad Request}
+	
+	This is a generic error code indicating that the request could not be understood by the server.
+	
+	\item \textbf{404 Not Found}
+	
+	The requested document does not exist on this server.
+	
+	\item \textbf{505 HTTP Version Not Supported}
+	
+	 The requested HTTP protocol version is not supported by the server.
+	 
+\end{itemize}
+
+\subsection{SMTP : Simple Mail Transfer Protocol}
+
+SMTP transfers messages from senders’ mail servers to the recipients’ mail servers.
+And it is primarily a \textbf{push protocol} --- the sending mail server pushes the file to the receiving mail server.
+Although SMTP has numerous wonderful qualities, it is nevertheless a legacy technology that possesses certain archaic characteristics. For example, it restricts the body (not just the headers) of all mail messages to simple 7-bit ASCII. It requires binary multimedia data to be encoded to ASCII before being sent over SMTP; and it requires the corresponding ASCII message to be decoded back to binary after SMTP transport.
+
+~\
+
+\texttt{telnet serverName 25}
+
+\texttt{S: 220 hamburger.edu}
+
+\texttt{C: HELO crepes.fr}
+
+\texttt{S: 250 Hello crepes.fr, pleased to meet you}
+
+\texttt{C: MAIL FROM: <alice@crepes.fr>}
+
+\texttt{S: 250 alice@crepes.fr ... Sender ok}
+
+\texttt{C: RCPT TO: <bob@hamburger.edu>}
+
+\texttt{S: 250 bob@hamburger.edu ... Recipient ok}
+
+\texttt{C: DATA}
+
+\texttt{S: 354 Enter mail, end with ”.” on a line by itself}
+
+\texttt{C: Do you like ketchup?}
+
+\texttt{C: How about pickles?}
+
+\texttt{C: .}
+
+\texttt{S: 250 Message accepted for delivery}
+
+\texttt{C: QUIT}
+
+\texttt{S: 221 hamburger.edu closing connection}
+
+\subsection{POP3 : Post Office Protocol --- Version 3}
+
+POP3 begins when the user agent opens a TCP connection to the mail server on port 110. With the TCP connection established, POP3 progresses through three phases: authorization, transaction, and update. 
+
+\begin{itemize}
+	\item During the first phase, authorization, the user agent sends a username and a password (in the clear) to authenticate the user.
+	
+	\texttt{telnet mailServer 110}
+
+	\texttt{+OK POP3 server ready}
+
+	\texttt{user bob}
+
+	\texttt{+OK}
+
+	\texttt{pass hungry}
+
+	\texttt{+OK user successfully logged on}
+	
+	\item During the second phase, transaction, the user agent retrieves messages; also during this phase, the user agent can mark messages for deletion, remove deletion marks, and obtain mail statistics.
+	
+	\texttt{C: list}
+	
+	\texttt{S: 1 498 }
+	
+	\texttt{S: 2 912 }
+	
+	\texttt{S: .}
+	
+	\texttt{C: retr 1}
+	
+	\texttt{S: (blah blah ...}
+	
+	\texttt{S: .................}
+	
+	\texttt{S: ..........blah)}
+	
+	\texttt{S: .}
+	
+	\texttt{C: dele 1}
+	
+	\texttt{C: retr 2}
+	
+	\texttt{S: (blah blah ... }
+	
+	\texttt{S: .................}
+	
+	\texttt{S: ..........blah)}
+	
+	\texttt{S: .}
+	
+	\texttt{C: dele 2}
+
+	\texttt{C: quit}
+	
+	\texttt{S: +OK POP3 server signing off}
+
+	
+	\item The third phase, update, occurs after the client has issued the quit command, ending the POP3 session; at this time, the mail server deletes the messages that were marked for deletion.
+\end{itemize}
+
+\subsection{IMAP : Internet Mail Access Protocol}
+
+An IMAP server will associate each message with a folder; when a message first arrives at the server, it is associated with the recipient’s INBOX folder. The recipient can then move the message into a new, user-created folder, read the message, delete the message, and so on. The IMAP protocol provides commands to allow users to create folders and move messages from one folder to another. IMAP also provides commands that allow users to search remote folders for messages matching specific criteria. Another important feature of IMAP is that it has commands that permit a user agent to obtain components of messages. For example, a user agent can obtain just the message header of a message or just one part of a multipart MIME message.
+
+\subsection{DNS : Domain Name System}
+
+The DNS is (1) a distributed database that translates hostnames to IP addresses and implemented in a hierarchy of DNS servers, and (2) an application-layer protocol that allows hosts to query the distributed database. DNS provides a few other important services in addition to translating hostnames to IP addresses:
+
+\begin{itemize}
+	\item \textbf{Host aliasing}
+	
+	A host with a complicated hostname can have one or more alias names.
+	
+	\item \textbf{Mail server aliasing}
+	
+	DNS can be invoked by a mail application to obtain the canonical hostname for a supplied alias hostname as well as the IP address of the host.
+	
+	\item \textbf{Load distribution}
+	
+	DNS is also used to perform load distribution among replicated servers, such as replicated Web servers.
+\end{itemize}
+
+\subsubsection{Distributed and Hierarchical DNS Structure}
+
+\begin{itemize}
+	\item \textbf{Root DNS servers}
+	
+	Root name servers provide the IP addresses of the TLD servers.
+	
+	\item \textbf{Top-level domain (TLD) servers}
+	
+	For each of the top-level domains,  there is TLD server (or server cluster).
+	
+	\item \textbf{Authoritative DNS servers}
+	
+	Every organization with publicly accessible hosts (such as Web servers and mail servers) on the Internet must provide publicly accessible DNS records that map the names of those hosts to IP addresses. An organization’s authoritative DNS server houses these DNS records.
+	
+\end{itemize}
+
+There is another important type of DNS server called the \textbf{local DNS server}. A local DNS server does not strictly belong to the hierarchy of servers but is nevertheless central to the DNS architecture. Each ISP has a local DNS server (also called a default name server). When a host connects to an ISP, the ISP provides the host with the IP addresses of one or more of its local DNS servers. When a host makes a DNS query, the query is sent to the local DNS server, which acts a proxy, forwarding the query into the DNS server hierarchy,
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/DNS.png}
+	\caption{hierarchy of DNS servers}
+	\label{fig:DNS}
+\end{figure}
+
+\subsubsection{RR : Resource Record}
+
+A resource record is a four-tuple that contains the following fields: 
+
+\texttt{(Name, Value, Type, TTL)}
+
+\texttt{TTL} is the time to live of the resource record; it determines when a resource should be removed from a cache.
+The meaning of \texttt{Name} and \texttt{Value} depend on \texttt{Type}:
+
+\begin{itemize}
+	\item 
+	
+	If \texttt{Type=A}, then \texttt{Name} is a hostname and \texttt{Value} is the IP address for the hostname. Thus, a \texttt{Type A} record provides the standard hostname-to-IP address mapping. 
+	
+	As an example, \texttt{(relay1.bar.foo.com, 145.37.93.126, A)} is a \texttt{Type A} record.
+	
+	\item
+	
+	If \texttt{Type=NS}, then \texttt{Name} is a domain (such as foo.com) and \texttt{Value} is the hostname of an authoritative DNS server that knows how to obtain the IP addresses for hosts in the domain. This record is used to route DNS queries further along in the query chain. 
+	
+	As an example, \texttt{(foo.com, dns.foo.com, NS)} is a \texttt{Type NS} record.
+	
+	\item
+	
+	If \texttt{Type=CNAME}, then \texttt{Value} is a canonical hostname for the alias hostname Name. This record can provide querying hosts the canonical name for a hostname. 
+	
+	As an example, \texttt{(foo.com, relay1.bar.foo.com, CNAME)} is a \texttt{CNAME} record.
+	
+	\item
+	
+	If \texttt{Type=MX}, then Value is the canonical name of a mail server that has an alias hostname Name. \texttt{MX} records allow the hostnames of mail servers to have simple aliases.
+	
+	As an example, \texttt{(foo.com, mail.bar.foo.com, MX)} is an \texttt{MX} record. 
+	
+\end{itemize}
+
+\subsubsection{DNS Messages}
+
+\begin{itemize}
+
+	\item 
+	
+	The first 12 bytes is the \textit{header section}, which has a number of fields. The first field is a 16-bit number that identifies the query. This identifier is copied into the reply message to a query, allowing the client to match received replies with sent queries. There are a number of flags in the flag field. A 1-bit query/reply flag indicates whether the message is a query (0) or a reply (1). A 1-bit authoritative flag is set in a reply message when a DNS server is an authoritative server for a queried name. A 1-bit recursion-desired flag is set when a client (host or DNS server) desires that the DNS server perform recursion when it doesn’t have the record. A 1-bit recursion-available field is set in a reply if the DNS server supports recursion. In the header, there are also four number-of fields. These fields indicate the number of occurrences of the four types of data sections that follow the header.
+	
+	\item
+	
+	The \textit{question section} contains information about the query that is being made. This section includes (1) a name field that contains the name that is being queried, and (2) a type field that indicates the type of question being asked about the name—for example, a host address associated with a name (\texttt{Type A}) or the mail server for a name (\texttt{Type MX}).
+	
+	\item
+	
+	In a reply from a DNS server, the \textit{answer section} contains the resource records for the name that was originally queried.
+	
+	\item
+	
+	The \textit{authority section} contains records of other authoritative servers.
+	
+	\item
+	
+	The \textit{additional section} contains other helpful records.
+
+
+\end{itemize}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/DnsMessage.png}
+	\caption{DNS message format}
+	\label{fig:DnsMessage}
+\end{figure}
+
+\subsection{Peer-to-Peer File Distribution}
+
+
+
+
+
+
+
+\newpage
+\section{Transport Layer}
+
+The Internet’s transport layer transports application-layer messages between application endpoints. In the Internet there are two transport protocols, TCP and UDP, either of which can transport application-layer messages. 
+
+\subsection{TCP : }
+
+\subsubsection{Connection-Oriented Service}
+
+TCP has the client and server exchange transport-layer control information with each other before the application-level messages begin to flow. This so-called handshaking procedure alerts the client and server, allowing them to prepare for an onslaught of packets. After the handshaking phase, a TCP connection is said to exist between the sockets of the two processes.
+
+\subsubsection{Reliable Data Transfer Service}
+
+The communicating processes can rely on TCP to deliver all data sent without error and in the proper order.
+
+\subsubsection{Congestion-Control Mechanism}
+
+\subsection{UDP : }
+
+\subsubsection{Connectionless Service}
+
+There is no handshaking before the two processes start to communicate.
+
+\subsubsection{Unreliable Data Transfer Service}
+
+UDP provides an unreliable data transfer service --- that is, when a process sends a message into a UDP socket, UDP provides no guarantee that the message will ever reach the receiving process. Furthermore, messages that do arrive at the receiving process may arrive out of order.
+
+\section{Terminology}
+
+\begin{itemize}
+
+	\item \textbf{RTT : Round-Trip Time}
+
+\end{itemize}
+
 
 \end{document}
