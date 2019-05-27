@@ -459,6 +459,92 @@ The meaning of \texttt{Name} and \texttt{Value} depend on \texttt{Type}:
 
 \subsection{Peer-to-Peer File Distribution}
 
+Denote the upload rate of the server’s access link by $u_s$, the upload rate of the $i$th peer’s access link by $u_i$, and the download rate of the $i$th peer’s access link by $d_i$. Also denote the size of the file to be distributed (in bits) by $F$ and the number of peers that want to obtain a copy of the file by $N$. 
+
+\subsubsection{Distribution Time for the Client-Server Architecture}
+
+\begin{itemize}
+	\item 
+	
+	The server must transmit one copy of the file to each of the $N$ peers. Thus the server must transmit $NF$ bits. Since the server’s upload rate is $u_s$, the time to distribute the file must be at least $\frac{NF}{u_s}$.
+	
+	\item
+	
+	Let $d_{min}$ denote the download rate of the peer with the lowest download rate. The peer with the lowest download rate cannot obtain all $F$ bits of the file in less than $\frac{F}{d_{min}}$ seconds. Thus the minimum distribution time is at least $\frac{F}{d_{min}}$.
+	
+\end{itemize}
+
+Putting these two observations together, we obtain
+
+\[
+	D_{cs} \ge \max \{\frac{NF}{u_s}, \frac{F}{d_{min}} \}
+\]
+
+This distribution time increases linearly with the number of peers $N$.
+
+\subsubsection{Distribution Time for the P2P Architecture}
+
+\begin{itemize}
+	\item 
+	
+	At the beginning of the distribution, only the server has the file. To get this file into the community of peers, the server must send each bit of the file at least once into its access link. Thus, the minimum distribution time is at least $\frac{F}{u_s}$.
+	
+	\item
+	
+	The peer with the lowest download rate cannot obtain all $F$ bits of the file in less than $\frac{F}{d_{min}}$ seconds. Thus the minimum distribution time is at least $\frac{F}{d_{min}}$.
+	
+	\item
+	
+	Finally, observe that the total upload capacity of the system as a whole is equal to the upload rate of the server plus the upload rates of each of the individual peers, that is, $u_{total} = u_s + \sum_{i=1}^N u_i$. The system must deliver (upload) $F$ bits to each of the $N$ peers, thus delivering a total of $NF$ bits. This cannot be done at a rate faster than $u_{total}$. Thus, the minimum distribution time is also at least $\frac{NF}{u_s + \sum_{i=1}^N u_i}$.
+	
+\end{itemize}
+
+Putting these three observations together, we obtain
+
+\[
+	D_{P2P} \ge \max \{\frac{F}{u_s}, \frac{F}{d_{min}}, \frac{NF}{u_s + \sum_{i=1}^N u_i} \}
+\]
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/DistributionTime.png}
+	\caption{Distribution time for P2P and client-server architectures}
+	\label{fig:DistributionTime}
+\end{figure}
+
+\subsection{BitTorrent}
+
+BitTorrent is a popular P2P protocol for file distribution. In BitTorrent lingo, the collection of all peers participating in the distribution of a particular file is called a \textbf{torrent}. Peers in a torrent download equal-size \textbf{chunks} of the file from one another, with a typical chunk size of 256 \textit{kbytes}. 
+
+When a peer first joins a torrent, it has no chunks. Over time it accumulates more and more chunks. While it downloads chunks it also uploads chunks to other peers. Once a peer has acquired the entire file, it may (selfishly) leave the torrent, or (altruistically) remain in the torrent and continue to upload chunks to other peers. Also, any peer may leave the torrent at any time with only a subset of chunks, and later rejoin the torrent.
+
+ Each torrent has an infrastructure node called a \textbf{tracker}. When a peer joins a torrent, it registers itself with the tracker and periodically informs the tracker that it is still in the torrent. In this manner, the tracker keeps track of the peers that are participating in the torrent.
+ 
+When a new peer, Alice, joins the torrent, the tracker randomly selects a subset of peers from the set of participating peers, and sends the IP addresses of these 50 peers to Alice. Possessing this list of peers, Alice attempts to establish concurrent TCP connections with all the peers on this list. Let’s call all the peers with which Alice succeeds in establishing a TCP connection ``neighboring peers". At any given time, each peer will have a subset of chunks from the file, with different peers having different subsets. Periodically, Alice will ask each of her neighboring peers for the list of the chunks they have. With this knowledge, Alice will issue requests for chunks she currently does not have.
+
+In deciding which chunks to request, Alice uses a technique called \textbf{rarest first}. The idea is to determine, from among the chunks she does not have, the chunks that are the rarest among her neighbors and then request those rarest chunks first. In this manner, the rarest chunks get more quickly redistributed, aiming to (roughly) equalize the numbers of copies of each chunk in the torrent.
+
+To determine which requests she responds to, BitTorrent uses a clever trading algorithm. The basic idea is that Alice gives priority to the neighbors that are currently supplying her data at the \textbf{highest rate}. Specifically, for each of her neighbors, Alice continually measures the rate at which she receives bits and determines the four peers that are feeding her bits at the highest rate. She then reciprocates by sending chunks to these same four peers. Every 10 seconds, she recalculates the rates and possibly modifies the set of four peers. In BitTorrent lingo, these four peers are said to be \textbf{unchoked}. Importantly, every 30 seconds, she also picks one additional neighbor at random and sends it chunks. Let’s call the randomly chosen peer Bob. In BitTorrent lingo, Bob is said to be \textbf{optimistically unchoked}. Because Alice is sending data to Bob, she may become one of Bob’s top four uploaders, in which case Bob would start to send data to Alice. If the rate at which Bob sends data to Alice is high enough, Bob could then, in turn, become one of Alice’s top four uploaders. In other words, every 30 seconds, Alice will randomly choose a new trading partner and initiate trading with that partner. If the two peers are satisfied with the trading, they will put each other in their top four lists and continue trading with each other until one of the peers finds a better partner. The effect is that peers capable of uploading at compatible rates tend to find each other. The random neighbor selection also allows new peers to get chunks, so that they can have something to trade. All other neighboring peers besides these five peers (four ``top" peers and one probing peer) are ``choked", that is, they do not receive any chunks from Alice.
+
+\subsection{DASH : Dynamic Adaptive Streaming over HTTP}
+
+In DASH, the video is encoded into several different versions, with each version having a different bit rate and, correspondingly, a different quality level. The client dynamically requests chunks of video segments of a few seconds in length. When the amount of available bandwidth is high, the client naturally selects chunks from a high-rate version; and when the available bandwidth is low, it naturally selects from a low-rate version. The client selects different chunks one at a time with HTTP GET request messages.
+
+\subsection{CDNs : Content Distribution Networks}
+
+A CDN manages servers in multiple geographically distributed locations, stores copies of the videos (and other types of Web content, including documents, images, and audio) in its servers, and attempts to direct each user request to a CDN location that will provide the best user experience. CDNs typically adopt one of two different server placement philosophies,
+
+\begin{itemize}
+
+	\item \textbf{Enter Deep}
+	
+	Deploy server clusters in access ISPs all over the world. The goal is to get close to end users, thereby improving user-perceived delay and throughput by decreasing the number of links and routers between the end user and the CDN server from which it receives content. Because of this highly distributed design, the task of maintaining and managing the clusters becomes challenging.
+	
+	\item \textbf{Bring Home}
+	
+	Bring the ISPs home by building large clusters at a smaller number (for example, tens) of sites. Instead of getting inside the access ISPs, these CDNs typically place their clusters in Internet Exchange Points (IXPs). Compared with the enter-deep design philosophy, the bring-home design typically results in lower maintenance and management overhead, possibly at the expense of higher delay and lower throughput to end users.
+
+\end{itemize}
 
 
 
