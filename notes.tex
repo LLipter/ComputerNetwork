@@ -107,10 +107,6 @@ The \textbf{transmission delay} is the amount of time required for the router to
 
 To provide structure to the design of network protocols, network designers organize protocols—and the network hardware and software that implement the protocols— in \textbf{layers}. We are interested in the \textbf{services} that a layer offers to the layer above—the so-called \textbf{service model} of a layer. When taken together, the protocols of the various layers are called the \textbf{protocol stack}.
 
-\subsection{Network Layer}
-
-The Internet’s network layer is responsible for moving network-layer packets known as datagrams from one host to another.
-
 \subsection{Link Layer}
 
 The Internet’s network layer routes a datagram through a series of routers between the source and destination. To move a packet from one node (host or router) to the next node in the route, the network layer relies on the services of the link layer.
@@ -546,45 +542,229 @@ A CDN manages servers in multiple geographically distributed locations, stores c
 
 \end{itemize}
 
+\section{Transport Layer}
+
+A transport-layer protocol provides for \textbf{logical communication} between application processes running on different hosts. By logical communication, we mean that from an application’s perspective, it is as if the hosts running the processes were directly connected; in reality, the hosts may be on opposite sides of the planet, connected via numerous routers and a wide range of link types.
+
+\subsection{Multiplexing and Demultiplexing}
+
+The job of delivering the data in a transport-layer segment to the correct socket is called \textbf{demultiplexing}. The job of gathering data chunks at the source host from different sockets, encapsulating each data chunk with header information to create segments, and passing the segments to the network layer is called \textbf{multiplexing}. A UDP socket is fully identified by a two-tuple consisting of a \textit{destination IP address} and a \textit{destination port number}. A TCP socket is fully identified by its own four-tuple, consisting of \textit{source IP address}, \textit{source port}, \textit{destination IP address} and \textit{destination port}.
+
+
+\subsection{UDP : User Datagram Protocol}
+
+\subsubsection{Characteristic}
+
+\begin{itemize}
+	\item \textbf{Connectionless Service}
+	
+	\item \textbf{Unreliable Data Transfer Service}
+\end{itemize}
+
+\subsubsection{Advantages}
+
+\begin{itemize}
+	\item \textbf{Finer application-level control over what and when data is sent}
+	
+	Under UDP, as soon as an application process passes data to UDP, UDP will package the data inside a UDP segment and immediately pass the segment to the network layer. TCP, on the other hand, has a congestion-control mechanism that throttles the transport-layer TCP sender when one or more links between the source and destination hosts become excessively congested. TCP will also continue to resend a segment until the receipt of the segment has been acknowledged by the destination, regardless of how long reliable delivery takes.
+	
+	\item \textbf{No connection establishment}
+	
+	TCP uses a three-way hand- shake before it starts to transfer data. UDP just blasts away without any formal preliminaries. Thus UDP does not introduce any delay to establish a connection.
+	
+	\item \textbf{No connection state}
+	
+	TCP maintains connection state in the end systems. This connection state includes receive and send buffers, congestion-control parameters, and sequence and acknowledgment number parameters. UDP, on the other hand, does not maintain connection state and does not track any of these parameters. For this reason, a server devoted to a particular application can typically support many more active clients when the application runs over UDP rather than TCP.
+	
+	\item \textbf{Small packet header overhead}
+	
+	The TCP segment has 20 bytes of header overhead in every segment, whereas UDP has only 8 bytes of overhead.
+\end{itemize}
+
+\subsubsection{UDP Structure}
+
+The UDP \textbf{checksum} provides for error detection. UDP at the sender side performs the 1s complement of the sum of all the 16-bit words in the segment, with any overflow encountered during the sum being wrapped around. The 1s complement is obtained by converting all the 0s to 1s and converting all the 1s to 0s. At the receiver, all four 16-bit words are added, including the checksum. If no errors are introduced into the packet, then clearly the sum at the receiver will be 1111111111111111. If one of the bits is a 0, then we know that errors have been introduced into the packet.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.4\linewidth]{images/udp.png}
+	\caption{UDP segment structure}
+	\label{fig:udp}
+\end{figure}
+
+\subsection{Principles of Reliable Data Transfer}
+
+TCP’s error-recovery mechanism is probably best categorized as a hybrid of GBN and SR protocols.
+
+\subsubsection{GBN : Go-Back-N}
+
+In a Go-Back-N (GBN) protocol, the sender is allowed to transmit multiple packets without waiting for an acknowledgment, but is constrained to have no more than some maximum allowable number, $N$, of unacknowledged packets in the pipeline.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/GBN.png}
+	\caption{Sender’s view of sequence numbers in Go-Back-N}
+	\label{fig:GBN}
+\end{figure}
+
+The receiver’s actions in GBN are also simple. If a packet with sequence number $n$ is received correctly and is in order (that is, the data last delivered to the upper layer came from a packet with sequence number $n - 1$), the receiver sends an ACK for packet $n$ and delivers the data portion of the packet to the upper layer. In all other cases, the receiver discards the packet and resends an ACK for the most recently received in-order packet. The use of \textbf{cumulative acknowledgments} is a natural choice for GBN.
+
+\subsubsection{SR : Selective Repeat}
+
+As the name suggests, selective-repeat protocols avoid unnecessary retransmissions by having the sender retransmit only those packets that it suspects were received in error at the receiver. This individual, as-needed, retransmission will require that the receiver \textbf{individually acknowledge} correctly received packets. A window size of $N$ will again be used to limit the number of outstanding, unacknowledged packets in the pipeline.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/SR.png}
+	\caption{Selective-repeat (SR) sender and receiver views of sequence-number space}
+	\label{fig:SR}
+\end{figure}
+
+\subsection{TCP : Transmission Control Protocol}
+
+\subsubsection{Characteristic}
+
+\begin{itemize}
+	\item \textbf{Connection-Oriented Service}
+	
+	\item \textbf{Reliable Data Transfer Service}
+	
+	\item \textbf{Full-Duplex Service}
+	
+	If there is a TCP connection between Process A on one host and Process B on another host, then application-layer data can flow from Process A to Process B at the same time as application-layer data flows from Process B to Process A.
+\end{itemize}
+
+\subsubsection{TCP Structure}
+
+\begin{itemize}
+	\item
+	
+	The 32-bit \textbf{sequence number field} and the 32-bit \textbf{acknowledgment number field} are used by the TCP sender and receiver in implementing a reliable data transfer service.
+	
+	\item 
+	
+	The 16-bit \textbf{receive window field} is used for flow control.
+	
+	\item
+	
+	The 4-bit \textbf{header length field} specifies the length of the TCP header in 32-bit words. The TCP header can be of variable length due to the TCP options field. Typically, the options field is empty, so that the length of the typical TCP header is 20 bytes.
+	
+	\item
+	
+	The optional and variable-length \textbf{options field} is used when a sender and receiver negotiate the maximum segment size (MSS) or as a window scaling factor for use in high-speed networks. A time-stamping option is also defined.
+	
+	\item
+	
+	The \textbf{ACK} bit is used to indicate that the value carried in the acknowledgment field is valid.
+	
+	\item
+	
+	The \textbf{RST}, \textbf{SYN}, and \textbf{FIN} bits are used for connection setup and teardown.
+	
+	\item
+	
+	The \textbf{CWR} and \textbf{ECE} bits are used in explicit congestion notification.
+	
+	\item 
+	
+	Setting the \textbf{PSH} bit indicates that the receiver should pass the data to the upper layer immediately.
+	
+	\item
+	
+	The \textbf{URG} bit is used to indicate that there is data in this segment that the sending-side upper-layer entity has marked as ``urgent". The location of the last byte of this urgent data is indicated by the 16-bit \textbf{urgent data pointer field}. 
+
+\end{itemize}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/tcp.png}
+	\caption{TCP segment structure}
+	\label{fig:tcp}
+\end{figure}
+
+\subsubsection{Sequence Numbers and Acknowledgment Numbers}
+
+\begin{itemize}
+
+	\item 
+	
+	The \textbf{sequence number} for a segment is therefore the byte-stream number of the first byte in the segment. 
+	
+	\item 
+	
+	The \textbf{acknowledgment number} that Host A puts in its segment is the sequence number of the next byte Host A is expecting from Host B. Thus, TCP is said to provide \textbf{cumulative acknowledgments}.
+\end{itemize}
+
+\subsubsection{Three-way Handshake}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\linewidth]{images/Three-wayHandshake.png}
+	\caption{TCP three-way handshake: segment exchange}
+	\label{fig:Three-wayHandshake}
+\end{figure}
+
+\subsubsection{Round-Trip Time Estimation and Timeout}
+
+\[
+	\mathrm{EstimatedRTT} = (1 - \alpha) \cdot \mathrm{EstimatedRTT} + \alpha \cdot \mathrm{SampleRTT}
+\]
+
+\textbf{EstimatedRTT} is an \textbf{exponential weighted moving average (EWMA)} of the \textbf{SampleRTT} values. The recommended value of $\alpha$ is 0.125.
+
+\[
+	\mathrm{DevRTT} = (1– \beta) \cdot \mathrm{DevRTT} + \beta \cdot | \mathrm{SampleRTT} - \mathrm{EstimatedRTT} |
+\]
+
+\textbf{DevRTT} is an \textbf{EWMA} of the difference between \textbf{SampleRTT} and \textbf{EstimatedRTT}. The recommended value of $\beta$ is 0.25.
+
+\[
+	\mathrm{TimeoutInterval} = \mathrm{EstimatedRTT} + 4 \cdot \mathrm{DevRTT}
+\]
+
+An initial \textbf{TimeoutInterval} value of 1 second is recommended. Also, when a timeout occurs, the value of \textbf{TimeoutInterval} is doubled to avoid a premature timeout occurring for a subsequent segment that will soon be acknowledged. However, as soon as a segment is received and \textbf{EstimatedRTT} is updated, the TimeoutInterval is again computed using the formula above.
+
+\subsubsection{Flow Control}
+
+TCP provides a \textbf{flow-control service} to its applications to eliminate the possibility of the sender overflowing the receiver’s buffer. TCP provides flow control by having the sender maintain a variable called the \textbf{receive window}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/rwnd.png}
+	\caption{The receive window (rwnd) and the receive buffer (RcvBuffer)}
+	\label{fig:rwnd}
+\end{figure}
+
+\subsubsection{Congestion Control --- Additive-increase, Multiplicative-decrease (AIMD)}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{images/CongestionControl.png}
+	\caption{FSM description of TCP congestion control}
+	\label{fig:CongestionControl}
+\end{figure}
+
 
 
 
 
 
 \newpage
-\section{Transport Layer}
+\section{Network Layer}
 
-The Internet’s transport layer transports application-layer messages between application endpoints. In the Internet there are two transport protocols, TCP and UDP, either of which can transport application-layer messages. 
+The Internet’s network layer is responsible for moving network-layer packets known as datagrams from one host to another. The Internet’s network-layer protocol has a name --- IP, for Internet Protocol. IP provides logical communication between hosts. The IP service model is a \textbf{best-effort delivery service}. This means that IP makes its ``best effort" to deliver segments between communicating hosts, but it makes no guarantees.
 
-\subsection{TCP : }
-
-\subsubsection{Connection-Oriented Service}
-
-TCP has the client and server exchange transport-layer control information with each other before the application-level messages begin to flow. This so-called handshaking procedure alerts the client and server, allowing them to prepare for an onslaught of packets. After the handshaking phase, a TCP connection is said to exist between the sockets of the two processes.
-
-\subsubsection{Reliable Data Transfer Service}
-
-The communicating processes can rely on TCP to deliver all data sent without error and in the proper order.
-
-\subsubsection{Congestion-Control Mechanism}
-
-\subsection{UDP : }
-
-\subsubsection{Connectionless Service}
-
-There is no handshaking before the two processes start to communicate.
-
-\subsubsection{Unreliable Data Transfer Service}
-
-UDP provides an unreliable data transfer service --- that is, when a process sends a message into a UDP socket, UDP provides no guarantee that the message will ever reach the receiving process. Furthermore, messages that do arrive at the receiving process may arrive out of order.
 
 \section{Terminology}
 
 \begin{itemize}
 
 	\item \textbf{RTT : Round-Trip Time}
+	
+	\item \textbf{MSS : Maximum Segment Size}
+	
+	\item \textbf{MTU : Maximum Transmission Unit}
 
 \end{itemize}
-
 
 \end{document}
