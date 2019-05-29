@@ -740,7 +740,21 @@ TCP provides a \textbf{flow-control service} to its applications to eliminate th
 
 \section{Network Layer}
 
-The Internet’s network layer is responsible for moving network-layer packets known as datagrams from one host to another. The Internet’s network-layer protocol has a name --- IP, for Internet Protocol. IP provides logical communication between hosts. The IP service model is a \textbf{best-effort delivery service}. This means that IP makes its ``best effort" to deliver segments between communicating hosts, but it makes no guarantees.
+The Internet’s network layer provides a single service, known as \textbf{best-effort service}. With best-effort service, packets are neither guaranteed to be received in the order in which they were sent, nor is their eventual delivery even guaranteed. There is no guarantee on the end-to-end delay nor is there a minimal bandwidth guarantee. It might appear that best-effort service is a euphemism for \textbf{no service at all}.
+
+\subsection{Control Plane}
+
+\begin{itemize}
+	\item \textbf{The Traditional Approach}
+	
+	A routing algorithm runs in each and every router and both forwarding and routing functions are contained within a router. 
+	
+	\item \textbf{The SDN Approach}
+	
+	
+\end{itemize}
+
+
 
 
 
@@ -768,6 +782,8 @@ While the job of the link layer is to move entire frames from one network elemen
 	\item \textbf{MSS : Maximum Segment Size}
 	
 	\item \textbf{MTU : Maximum Transmission Unit}
+	
+	\item \textbf{SDN : Software-Defined Networking}
 
 \end{itemize}
 
