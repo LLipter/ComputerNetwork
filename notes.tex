@@ -979,15 +979,29 @@ The NAT-enabled router does not look like a router to the outside world. Instead
 	\label{fig:Tunneling}
 \end{figure}
 
+\subsection{Routing Algorithms}
 
+A \textbf{centralized routing algorithm} computes the least-cost path between a source and destination using complete, global knowledge about the network. Algorithms with global state information are often referred to as \textbf{link-state (LS) algorithms}, since the algorithm must be aware of the cost of each link in the network.
 
+In a \textbf{decentralized routing algorithm}, the calculation of the least-cost path is carried out in an iterative, distributed manner by the routers. No node has complete information about the costs of all network links. Instead, each node begins with only the knowledge of the costs of its own directly attached links. Then, through an iterative process of calculation and exchange of information with its neighboring nodes, a node gradually calculates the least-cost path to a destination or set of destinations. \textbf{Distance-vector (DV) algorithm} is one of these algorithms.
 
+A second broad way to classify routing algorithms is according to whether they are static or dynamic. In \textbf{static routing algorithms}, routes change very slowly over time, often as a result of human intervention (for example, a human manually editing a link costs). \textbf{Dynamic routing algorithms} change the routing paths as the network traffic loads or topology change. A dynamic algorithm can be run either periodically or in direct response to topology or link cost changes. While dynamic algorithms are more responsive to network changes, they are also more susceptible to problems such as routing loops and route oscillation.
 
+A third way to classify routing algorithms is according to whether they are load-sensitive or load-insensitive. In a \textbf{load-sensitive algorithm}, link costs vary dynamically to reflect the current level of congestion in the underlying link. If a high cost is associated with a link that is currently congested, a routing algorithm will tend to choose routes around such a congested link. Today’s Internet routing algorithms are \textbf{load-insensitive}, as a link’s cost does not explicitly reflect its current (or recent past) level of congestion.
 
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/ls.png}
+	\caption{Link-State (LS) Algorithm for Source Node $u$}
+	\label{fig:ls}
+\end{figure}
 
-
-
-
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/dv.png}
+	\caption{Distance-Vector (DV) Algorithm}
+	\label{fig:dv}
+\end{figure}
 
 
 
