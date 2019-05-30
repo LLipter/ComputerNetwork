@@ -11,6 +11,8 @@
 \author{\Name}
 \markboth{Notes on \Topic\ }{Notes on \Topic\ }
 \date{\today}
+
+\usepackage[scale=0.75]{geometry}
  
 \pagestyle{fancy}
 \fancyhf{}
@@ -19,10 +21,7 @@
 \rfoot{\thepage}
 
 \textheight=9in
-%\textwidth=6.5in
 \topmargin=-.75in
-%\oddsidemargin=0in
-%\evensidemargin=0in
  
 \begin{document}
 \maketitle
@@ -751,8 +750,246 @@ The Internet’s network layer provides a single service, known as \textbf{best-
 	
 	\item \textbf{The SDN Approach}
 	
+	A physically separate remote controller computes and distributes the forwarding tables to be used by each and every router.
 	
 \end{itemize}
+
+\subsection{Switching}
+
+\begin{itemize}
+	\item \textbf{Switching via memory}
+	
+	Switching between input and output ports being done under direct control of the CPU. Input and output ports functioned as traditional I/O devices in a traditional operating system. An input port with an arriving packet first signaled the routing processor via an interrupt. The packet was then copied from the input port into processor memory. The routing processor then extracted the destination address from the header, looked up the appropriate output port in the forwarding table, and copied the packet to the output port’s buffers. Note also that \textbf{two packets cannot be forwarded at the same time}, even if they have different destination ports, since only one memory read/write can be done at a time over the shared system bus.
+	
+	\item \textbf{Switching via a bus}
+	
+	In this approach, an input port transfers a packet directly to the output port over a shared bus, without intervention by the routing processor. This is typically done by having the input port pre-pend a switch-internal label (header) to the packet indicating the local output port to which this packet is being transferred and transmitting the packet onto the bus. All output ports receive the packet, but only the port that matches the label will keep the packet. The label is then removed at the output port, as this label is only used within the switch to cross the bus. If multiple packets arrive to the router at the same time, each at a different input port, all but one must wait since only one packet can cross the bus at a time. Thus,  \textbf{two packets cannot be forwarded at the same time}.
+	
+	\item \textbf{Switching via an interconnection network}
+	
+	A crossbar switch is an interconnection network consisting of $2N$ buses that connect $N$ input ports to $N$ output ports. Each vertical bus intersects each horizontal bus at a crosspoint, which can be opened or closed at any time by the switch fabric controller. Unlike the previous two switching approaches, crossbar switches are \textbf{capable of forwarding multiple packets in parallel}. However, if two packets from two different input ports are destined to that same output port, then one will have to wait at the input, since only one packet can be sent over any given bus at a time.
+	
+\end{itemize}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/switching.png}
+	\caption{Three switching techniques}
+	\label{fig:switching}
+\end{figure}
+
+
+
+\subsection{Input Queueing}
+
+Figure \ref{fig:hol} shows an example in which two packets (darkly shaded) at the front of their input queues are destined for the same upper-right output port. Suppose that the switch fabric chooses to transfer the packet from the front of the upper-left queue. In this case, the darkly shaded packet in the lower-left queue must wait. But not only must this darkly shaded packet wait, so too must the lightly shaded packet that is queued behind that packet in the lower-left queue, even though there is no conten- tion for the middle-right output port (the destination for the lightly shaded packet). This phenomenon is known as head-of-the-line (HOL) blocking in an input-queued switch—a queued packet in an input queue must wait for transfer through the fabric (even though its output port is free) because it is blocked by another packet at the head of the line. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/hol.png}
+	\caption{HOL blocking at and input-queued switch}
+	\label{fig:hol}
+\end{figure}
+
+\subsection{Packet Scheduling}
+
+\begin{itemize}
+	\item \textbf{First-in-First-Out (FIFO)}
+	
+	\item \textbf{Priority Queuing}
+	
+	\item \textbf{Round Robin and Weighted Fair Queuing (WFQ)}
+\end{itemize}
+
+
+\subsection{The Internet Protocol Version 4}
+
+\begin{itemize}
+	
+	\item \textbf{Version number}
+	
+	 These 4 bits specify the IP protocol version of the datagram.
+	 
+	 \item \textbf{Header length}
+	 
+	  Because an IPv4 datagram can contain a variable number of options, these 4 bits are needed to determine where in the IP datagram the payload actually begins. Most IP datagrams do not contain options, so the typical IP datagram has a \textbf{20-byte header}.
+	  
+	  \item \textbf{Type of service}
+	  
+	  The type of service (TOS) bits were included in the IPv4 header to allow different types of IP datagrams to be distinguished from each other.
+	  
+	  \item \textbf{Datagram length}
+	  
+	  This is the total length of the IP datagram (header plus data), measured in bytes.
+	  
+	  \item \textbf{Identifier, flags, fragmentation offset}
+	  
+	  These three fields have to do with so-called IP fragmentation.
+	  
+	  \item \textbf{Time-to-live}
+	  
+	  The time-to-live field is included to ensure that datagrams do not circulate forever in the network. This field is decremented by one each time the datagram is processed by a router. If the TTL field reaches 0, a router must drop that datagram.
+	  
+	  \item \textbf{Protocol}
+	  
+	  This field is typically used only when an IP datagram reaches its final destination. The value of this field indicates the specific transport-layer protocol to which the data portion of this IP datagram should be passed. For example, a value of 6 indicates that the data portion is passed to TCP, while a value of 17 indicates that the data is passed to UDP.
+	   
+	  \item \textbf{Header checksum}
+	  
+	  The header checksum aids a router in detecting bit errors in a received IP datagram. The header checksum is computed by treating each 2 bytes in the header as a number and summing these numbers using 1s complement arithmetic. 
+	    
+	  \item \textbf{Source and destination IP addresses}
+	  
+	  When a source creates a datagram, it inserts its IP address into the source IP address field and inserts the address of the ultimate destination into the destination IP address field.
+	  
+	  \item \textbf{Options}
+	  
+	  The options fields allow an IP header to be extended. Header options were meant to be used rarely.
+	  
+	  \item \textbf{Data (payload)}
+	  
+	  The data field of the IP datagram contains the transport-layer segment (TCP or UDP) to be delivered to the destination.
+	
+\end{itemize}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{images/ipv4.png}
+	\caption{IPv4 datagram format}
+	\label{fig:ipv4}
+\end{figure}
+
+\subsection{IPv4 Addressing}
+
+An IP address is technically associated with an interface, rather than with the host or router containing that interface. Addresses are typically written in so-called \textbf{dotted-decimal notation}, in which each byte of the address is written in its decimal form and is separated by a period (dot) from other bytes in the address. 
+
+To determine the subnets, detach each interface from its host or router, creating islands of isolated networks, with interfaces terminating the end points of the isolated networks. Each of these isolated networks is called a \textbf{subnet}. 
+
+The Internet’s address assignment strategy is known as \textbf{Classless Interdomain Routing} (CIDR—pronounced cider). CIDR generalizes the notion of subnet addressing. As with subnet addressing, the 32-bit IP address is divided into two parts and again has the dotted-decimal form $a.b.c.d/x$, where $x$ indicates the number of bits in the first part of the address.
+
+Before CIDR was adopted, the network portions of an IP address were constrained to be 8, 16, or 24 bits in length, an addressing scheme known as \textbf{classful addressing}, since subnets with 8-, 16-, and 24-bit subnet addresses were known as class A, B, and C networks, respectively. The requirement that the subnet portion of an IP address be exactly 1, 2, or 3 bytes long turned out to be problematic for supporting the rapidly growing number of organizations with small and medium-sized subnets.
+
+Also, when a host sends a datagram with destination address $255.255.255.255$, the message is delivered to all hosts on the same subnet. It is called \textbf{broadcast address}
+
+\subsection{DHCP : The Dynamic Host Configuration Protocol}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.45\linewidth]{images/DHCP.png}
+	\caption{DHCP client-server interaction}
+	\label{fig:DHCP}
+\end{figure}
+
+\begin{itemize}
+	\item \textbf{DHCP server discovery}
+	
+	The first task of a newly arriving host is to find a DHCP server with which to interact. This is done using a DHCP discover message, which a client sends within a UDP packet to port 67 with broadcast destination IP address.
+	
+	\item \textbf{DHCP server offer(s)}
+	
+	A DHCP server receiving a DHCP discover message responds to the client with a DHCP offer message, which is also sent to broadcast IP address.
+	
+	\item \textbf{DHCP request}
+
+	The newly arriving client will choose from among one or more server offers and respond to its selected offer with a DHCP request message, echoing back the configuration parameters.
+	
+	\item \textbf{DHCP ACK}
+	
+	The server responds to the DHCP request message with a DHCP ACK message, confirming the requested parameters.
+	
+\end{itemize}
+
+
+
+\subsection{NAT : Network Address Translation}
+
+The address space 10.0.0.0/8 is one of three portions of the IP address space that is reserved in for a \textbf{private network} or a \textbf{realm with private addresses}. A realm with private addresses refers to a network whose addresses only have meaning to devices within that network. 
+
+The NAT-enabled router does not look like a router to the outside world. Instead the NAT router behaves to the outside world as a single device with a single IP address. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/NAT.png}
+	\caption{Network address translation}
+	\label{fig:NAT}
+\end{figure}
+
+\subsection{The Internet Protocol Version 6}
+
+\begin{itemize}
+	\item \textbf{Expanded addressing capabilities}
+	
+	IPv6 increases the size of the IP address from 32 to 128 bits. This ensures that the world won’t run out of IP addresses.
+	
+	\item \textbf{A streamlined 40-byte header}
+	
+	As discussed below, a number of IPv4 fields have been dropped or made optional. The resulting 40-byte fixed-length header allows for faster processing of the IP datagram by a router.
+	
+	\item \textbf{Flow labeling}
+	
+	IPv6 has an elusive definition of a flow.
+	
+\end{itemize}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/ipv6.png}
+	\caption{IPv6 datagram format}
+	\label{fig:ipv6}
+\end{figure}
+
+\begin{itemize}
+	\item \textbf{Version}
+	
+	This 4-bit field identifies the IP version number. Not surprisingly, IPv6 carries a value of 6 in this field. Note that putting a 4 in this field does not create a valid IPv4 datagram.
+	
+	\item \textbf{Traffic class}
+	
+	The 8-bit traffic class field, like the TOS field in IPv4, can be used to give priority to certain datagrams within a flow, or it can be used to give priority to datagrams from certain applications over datagrams from other applications
+	
+	\item \textbf{Flow label} 
+	This 20-bit field is used to identify a flow of datagrams.
+	
+	\item \textbf{Payload length}
+	
+	This 16-bit value is treated as an unsigned integer giving the number of bytes in the IPv6 datagram following the fixed-length, 40-byte data- gram header.
+	
+	\item \textbf{Next header}
+	
+	This field identifies the protocol to which the contents (data field) of this datagram will be delivered (for example, to TCP or UDP). The field uses the same values as the protocol field in the IPv4 header.
+	
+	\item \textbf{Hop limit}
+	
+	The contents of this field are decremented by one by each router that forwards the datagram. If the hop limit count reaches zero, the datagram is discarded.
+	
+	\item \textbf{Source and destination addresses}
+	
+	\item \textbf{Data} 
+	
+	This is the payload portion of the IPv6 datagram. When the datagram reaches its destination, the payload will be removed from the IP datagram and passed on to the protocol specified in the next header field.
+	
+\end{itemize}
+
+\subsection{Transitioning from IPv4 to IPv6}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/Tunneling.png}
+	\caption{Tunneling}
+	\label{fig:Tunneling}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -763,11 +1000,11 @@ The Internet’s network layer provides a single service, known as \textbf{best-
 
 \newpage
 
-\subsubsection{Link Layer}
+\section{Link Layer}
 
 The Internet’s network layer routes a datagram through a series of routers between the source and destination. To move a packet from one node (host or router) to the next node in the route, the network layer relies on the services of the link layer.
 
-\subsubsection{Physical Layer}
+\section{Physical Layer}
 
 While the job of the link layer is to move entire frames from one network element to an adjacent network element, the job of the physical layer is to move the individual bits within the frame from one node to the next.
 
