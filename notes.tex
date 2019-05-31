@@ -1003,6 +1003,28 @@ A third way to classify routing algorithms is according to whether they are load
 	\label{fig:dv}
 \end{figure}
 
+\subsection{Intra-AS Routing in the Internet : OSPF}
+
+Each \textbf{autonomous systems (AS)} consisting of a group of routers that are under the same administrative control. An autonomous system is identified by its globally unique \textbf{autonomous system number (ASN)}. Routers within the same AS all run the same routing algorithm and have information about each other. The routing algorithm running within an autonomous system is called an \textbf{intra-autonomous system routing protocol}.
+
+OSPF is a link-state protocol that uses flooding of link-state information and a Dijkstra’s least-cost path algorithm. With OSPF, each router constructs a complete topological map of the entire autonomous system. Each router then locally runs Dijkstra’s shortest-path algorithm to determine a shortest-path tree to all subnets, with itself as the root node. Individual link costs are configured by the network administrator.
+
+\subsection{Routing Among the ISPs : BGP}
+
+In fact, in the Internet, all ASs run the same \textbf{inter-autonomous system routing protocol}, called the \textbf{Border Gateway Protocol}, more commonly known as BGP. In BGP, packets are not routed to a specific destination address, but instead to CIDRized prefixes, with each prefix representing a subnet or a collection of subnets.
+
+In \textbf{hot potato routing}, the route chosen (from among all possible routes) is that route with the least cost to the NEXT-HOP router beginning that route. 
+
+\subsection{ICMP : The Internet Control Message Protocol}
+
+The Internet Control Message Protocol (ICMP), is used by hosts and routers to communicate network-layer information to each other. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/ICMP.png}
+	\caption{ICMP message types}
+	\label{fig:ICMP}
+\end{figure}
 
 
 
