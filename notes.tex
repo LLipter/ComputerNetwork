@@ -1026,25 +1026,128 @@ The Internet Control Message Protocol (ICMP), is used by hosts and routers to co
 	\label{fig:ICMP}
 \end{figure}
 
-
-
-
-
-
-
-
-
-\newpage
-
 \section{Link Layer}
 
 The Internet’s network layer routes a datagram through a series of routers between the source and destination. To move a packet from one node (host or router) to the next node in the route, the network layer relies on the services of the link layer.
 
-\section{Physical Layer}
+\subsection{CRC : Cyclic Redundancy Check}
 
-While the job of the link layer is to move entire frames from one network element to an adjacent network element, the job of the physical layer is to move the individual bits within the frame from one node to the next.
+Consider the $d$-bit piece of data, $D$, that the sending node wants to send to the receiving node. The sender and receiver must first agree on an $r + 1$ bit pattern, known as a \textbf{generator}, which we will denote as $G$. We will require that the most significant (leftmost) bit of $G$ be a 1. The key idea behind CRC codes is shown in Figure \ref{fig:CRC}. For a given piece of data, $D$, the sender will choose $r$ additional bits, $R$, and append them to $D$ such that the resulting $d + r$ bit pattern (interpreted as a binary number) is exactly divisible by $G$ (i.e., has no remainder) using modulo-2 arithmetic. The process of error checking with CRCs is thus simple: The receiver divides the $d + r$ received bits by $G$. If the remainder is nonzero, the receiver knows that an error has occurred; otherwise the data is accepted as being correct. All CRC calculations are done in modulo-2 arithmetic without carries in addition or borrows in subtraction. This means that addition and subtraction are identical, and both are equivalent to the bitwise exclusive-or (XOR) of the operands. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{images/CRC.png}
+	\caption{CRC}
+	\label{fig:CRC}
+\end{figure}
+
+$R$ can be computed as follows, 
+\[
+	R = \mathrm{remainder} \frac{D \cdot 2^r}{G}
+\]
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\linewidth]{images/CRCC.png}
+	\caption{A sample CRC calculation}
+	\label{fig:CRCC}
+\end{figure}
+
+\subsection{Random Access Protocols}
+
+In a random access protocol, a transmitting node always transmits at the full rate of the channel, namely, $R$ bps. When there is a collision, each node involved in the collision repeatedly retransmits its frame until its frame gets through without a collision. But when a node experiences a collision, it doesn’t necessarily retransmit the frame right away. Instead it waits a random delay before retransmitting the frame. Each node involved in a collision chooses independent random delays. 
+
+\subsubsection{Slotted ALOHA}
+
+In our description of slotted ALOHA, we assume the following:
+
+\begin{itemize}
+	\item All frames consist of exactly $L$ bits.
+	
+	\item Time is divided into slots of size $\frac{L}{R}$ seconds (that is, a slot equals the time to transmit one frame).
+	
+	\item Nodes start to transmit frames only at the beginnings of slots.
+	
+	\item The nodes are synchronized so that each node knows when the slots begin.
+	
+	\item If two or more frames collide in a slot, then all the nodes detect the collision event before the slot ends.
+\end{itemize}
+
+Let $p$ be a probability, that is, a number between 0 and 1. The operation of slotted ALOHA in each node is simple:
+
+\begin{itemize}
+	\item When the node has a fresh frame to send, it waits until the beginning of the next slot and transmits the entire frame in the slot.
+	
+	\item If there isn’t a collision, the node has successfully transmitted its frame and thus need not consider retransmitting the frame. (The node can prepare a new frame for transmission, if it has one.)
+	
+	\item If there is a collision, the node detects the collision before the end of the slot. The node retransmits its frame in each subsequent slot with probability $p$ until the frame is transmitted without a collision.
+
+\end{itemize}
+
+Suppose there are $N$ nodes. Then the probability that a given slot is a successful slot is the probability that one of the nodes transmits and that the remaining $N - 1$ nodes do not transmit. The probability that a given node transmits is $p$; the probability that the remaining nodes do not transmit is $(1 - p)^{N-1}$. Therefore the probability a given node has a success is $p(1 - p)^{N-1}$. Because there are $N$ nodes, the probability that any one of the $N$ nodes has a success is $Np(1 - p)^{N - 1}$.
+
+\subsection{CSMA : Carrier Sense Multiple Access}
+
+\subsubsection{Characteristic}
+
+\begin{itemize}
+	\item  \textbf{Carrier Sensing}
+	
+	A node listens to the channel before transmitting. If a frame from another node is currently being transmitted into the channel, a node then waits until it detects no transmissions for a short amount of time and then begins transmission.
+	
+	\item \textbf{Collision detection}
+	
+	A transmitting node listens to the channel while it is transmitting. If it detects that another node is transmitting an interfering frame, it stops transmitting and waits a random amount of time before repeating the sense-and-transmit-when-idle cycle.
+	
+\end{itemize}
+
+\subsubsection{Operations from the Perspective of an Node}
+
+\begin{enumerate}
+
+	\item The adapter obtains a datagram from the network layer, prepares a link-layer frame, and puts the frame adapter buffer.
+	\item If the adapter senses that the channel is idle (that is, there is no signal energy entering the adapter from the channel), it starts to transmit the frame. If, on the other hand, the adapter senses that the channel is busy, it waits until it senses no signal energy and then starts to transmit the frame.
+	
+	\item While transmitting, the adapter monitors for the presence of signal energy coming from other adapters using the broadcast channel.
+	
+	\item If the adapter transmits the entire frame without detecting signal energy from other adapters, the adapter is finished with the frame. If, on the other hand, the adapter detects signal energy from other adapters while transmitting, it aborts the transmission (that is, it stops transmitting its frame).
+	
+	\item After aborting, the adapter waits a random amount of time and then returns to step 2.
+\end{enumerate}
+
+\subsubsection{Binary Exponential Backoff Algorithm}
+When transmitting a frame that has already experienced $n$ collisions, a node chooses the value of $K$ at random from $\{0,1,2, . . . . 2^{n-1}\}$. Thus, the more collisions experienced by a frame, the larger the interval from which $K$ is chosen.
+
+\subsubsection{Efficiency}
+
+Let $d_{prop}$ denote the maximum time it takes signal energy to propagate between any two adapters. Let $d_{trans}$ be the time to transmit a maximum-size frame. Here we simply state the following approximation:
+
+\[
+	\mathrm{Efficiency} = \frac{1}{1 + 5 \frac{d_{prop}}{d_{trans}}}
+\]
+
+We see from this formula that as $d_{prop}$ approaches 0, the efficiency approaches 1. This matches our intuition that if the propagation delay is zero, colliding nodes will abort immediately without wasting the channel. Also, as $d_{trans}$ becomes very large, efficiency approaches 1. This is also intuitive because when a frame grabs the channel, it will hold on to the channel for a very long time; thus, the channel will be doing productive work most of the time.
+
+\subsection{Taking-Turns Protocols}
+
+\subsubsection{Polling Protocol}
+
+The first one is the polling protocol. The polling protocol requires one of the nodes to be designated as a master node. The master node polls each of the nodes in a round-robin fashion. In particular, the master node first sends a message to node 1, saying that it (node 1) can transmit up to some maximum number of frames. After node 1 transmits some frames, the master node tells node 2 it (node 2) can transmit up to the maximum number of frames. The procedure continues in this manner, with the master node polling each of the nodes in a cyclic manner.
+
+\subsubsection{Token-Passing Protocol}
+
+In this protocol there is no master node. A small, special-purpose frame known as a token is exchanged among the nodes in some fixed order. For example, node 1 might always send the token to node 2, node 2 might always send the token to node 3, and node $N$ might always send the token to node 1. When a node receives a token, it holds onto the token only if it has some frames to transmit; otherwise, it immediately forwards the token to the next node. If a node does have frames to transmit when it receives the token, it sends up to a maximum number of frames and then forwards the token to the next node. 
+
+\subsection{MAC Addresses}
+
+A link-layer address is variously called a \textbf{LAN address}, a \textbf{physical address}, or a \textbf{MAC address}. Because MAC address seems to be the most popular term, we’ll henceforth refer to link-layer addresses as MAC addresses. The MAC address is 6 bytes long, giving 248 possible MAC addresses. The \textbf{broadcast address} is a string of 48 consecutive 1s (that is, FF-FF-FF-FF-FF-FF in hexadecimal notation).
+
+\subsection{ARP : Address Resolution Protocol}
+
+ARP resolves IP addresses only for hosts and router interfaces on the same subnet. Each host and router has an ARP table in its memory, which contains mappings of IP addresses to MAC addresses. An \textbf{ARP packet} has several fields, including the sending and receiving IP and MAC addresses. Both ARP query and response packets have the same format. The purpose of the ARP query packet is to query all the other hosts and routers on the subnet to determine the MAC address corresponding to the IP address that is being resolved.
 
 
+\newpage
 
 \section{Terminology}
 
